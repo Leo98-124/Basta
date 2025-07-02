@@ -23,8 +23,7 @@
       color: #333;
     }
 
-    input[type="text"],
-    button {
+    input[type="text"], button {
       width: 100%;
       max-width: 300px;
     }
@@ -54,16 +53,12 @@
       transition: all 0.3s ease;
     }
 
-    /* ✅ Color verde para ambos botones de acción principal */
-    #continuarBtn,
-    #continuarBtnJuego {
+    #continuarBtn, #continuarBtnJuego {
       background-color: #28a745;
-      color: white;
       font-weight: bold;
     }
 
-    #continuarBtn:hover,
-    #continuarBtnJuego:hover {
+    #continuarBtn:hover, #continuarBtnJuego:hover {
       background-color: #218838;
     }
 
@@ -97,7 +92,8 @@
       color: #dc3545;
     }
 
-    #tablaRespuestas {
+    #tablaRespuestas,
+    #tablaTotales {
       overflow-x: auto;
       width: 100%;
     }
@@ -112,8 +108,7 @@
       overflow-wrap: break-word;
     }
 
-    th,
-    td {
+    th, td {
       border: 1px solid #333;
       padding: 0.6em;
       text-align: center;
@@ -154,23 +149,6 @@
       margin-top: 2em;
     }
 
-    #tablaTotales {
-      overflow-x: auto;
-    }
-
-    #tablaTotales table {
-      border-collapse: collapse;
-      margin: 1em auto;
-      background-color: white;
-      width: 100%;
-    }
-
-    #tablaTotales th,
-    #tablaTotales td {
-      border: 1px solid #333;
-      padding: 0.6em;
-    }
-
     #volverInicioBtn {
       margin-top: 1em;
       background-color: #6f42c1;
@@ -184,6 +162,16 @@
 
     #volverInicioBtn:hover {
       background-color: #5936a2;
+    }
+
+    #historialRespuestas h3 {
+      color: #444;
+      margin-top: 2em;
+    }
+
+    #historialRespuestas h4 {
+      margin-bottom: 0.4em;
+      color: #333;
     }
 
     @media (min-width: 768px) {
@@ -202,26 +190,16 @@
     }
 
     @media (max-width: 480px) {
-      h1,
-      h2,
-      h3,
-      #rondaActual,
-      #letra,
-      #reloj {
+      h1, h2, h3, #rondaActual, #letra, #reloj {
         font-size: 1.1em;
       }
 
-      table th,
-      table td {
+      table th, table td {
         font-size: 0.8em;
         padding: 0.4em;
       }
 
-      #continuarBtn,
-      #continuarBtnJuego,
-      #bastaBtn,
-      #stopBtn,
-      #volverInicioBtn {
+      button {
         font-size: 1em;
         padding: 0.6em 1.2em;
       }
@@ -234,14 +212,10 @@
 
   <!-- Pantalla de inicio -->
   <div id="pantallaInicio">
-    <h2>Ingresa los nombres de los jugadores:</h2>
+    <h2>Ingresa tu nombre:</h2>
     <div id="inputsJugadores">
-      <input type="text" placeholder="Jugador 1" />
-      <input type="text" placeholder="Jugador 2" />
-      <input type="text" placeholder="Jugador 3" />
-      <input type="text" placeholder="Jugador 4" />
+      <input type="text" id="nombreJugador" placeholder="Tu nombre" />
     </div>
-    <!-- Botón para iniciar el juego -->
     <button id="continuarBtn" style="display: inline-block;">Comenzar</button>
   </div>
 
@@ -274,6 +248,7 @@
   <div id="pantallaResultados" style="display: none;">
     <h2>Resultados Finales</h2>
     <div id="tablaTotales" style="overflow-x: auto;"></div>
+    <div id="historialRespuestas"></div>
     <button id="volverInicioBtn">Jugar de nuevo</button>
   </div>
 
@@ -287,28 +262,35 @@
   let estadoJuego = "inicio";
 
   const reloj = document.getElementById("reloj");
-  const continuarBtn = document.getElementById("continuarBtn");           // botón de la pantalla de inicio
-  const continuarBtnJuego = document.getElementById("continuarBtnJuego"); // botón durante el juego
+  const continuarBtn = document.getElementById("continuarBtn");
+  const continuarBtnJuego = document.getElementById("continuarBtnJuego");
   const bastaBtn = document.getElementById("bastaBtn");
   const stopBtn = document.getElementById("stopBtn");
 
-  // --- BOTÓN "Comenzar" en pantalla de inicio ---
   continuarBtn.addEventListener("click", () => {
-    iniciarJuego();
+    const nombre = document.getElementById("nombreJugador").value.trim();
+    if (!nombre) {
+      alert("Por favor ingresa tu nombre.");
+      return;
+    }
+    jugadores = [nombre];
     estadoJuego = "letra";
+    document.getElementById("pantallaInicio").style.display = "none";
+    document.getElementById("pantallaJuego").style.display = "block";
+    reloj.textContent = "60";
+    document.getElementById("rondaActual").textContent = `Ronda: ${numeroRonda}`;
+    document.getElementById("tablaRespuestas").innerHTML = "";
+    document.getElementById("letraManual").value = "";
+    document.getElementById("letra").textContent = "";
     continuarBtn.style.display = "none";
     continuarBtnJuego.textContent = "Iniciar Ronda";
     continuarBtnJuego.style.display = "inline-block";
   });
 
-  // --- BOTÓN durante el juego ("Iniciar ronda" o "Guardar puntos") ---
   continuarBtnJuego.addEventListener("click", () => {
     switch (estadoJuego) {
       case "letra":
         iniciarRonda();
-        estadoJuego = "jugando";
-        continuarBtnJuego.style.display = "none";
-        bastaBtn.style.display = "inline-block";
         break;
       case "puntuando":
         guardarPuntos();
@@ -327,32 +309,12 @@
     }
   });
 
-  function iniciarJuego() {
-    jugadores = Array.from(document.querySelectorAll("#inputsJugadores input"))
-      .map(input => input.value.trim())
-      .filter(n => n !== "");
-
-    if (jugadores.length === 0) {
-      alert("Agrega al menos un jugador");
-      return;
-    }
-
-    document.getElementById("pantallaInicio").style.display = "none";
-    document.getElementById("pantallaJuego").style.display = "block";
-    reloj.textContent = "60";
-    document.getElementById("rondaActual").textContent = `Ronda: ${numeroRonda}`;
-    document.getElementById("tablaRespuestas").innerHTML = "";
-    document.getElementById("letraManual").value = "";
-    document.getElementById("letra").textContent = "";
-  }
-
   function iniciarRonda() {
     const letraInput = document.getElementById("letraManual").value.trim().toUpperCase();
     if (!/^[A-ZÑ]$/.test(letraInput)) {
       alert("Por favor ingresa una letra válida (A-Z o Ñ).");
       return;
     }
-
     letraActual = letraInput;
     document.getElementById("letra").textContent = `Letra: ${letraActual}`;
     document.getElementById("letraManual").disabled = true;
@@ -360,6 +322,9 @@
     bloquearPuntosCategoria();
     activarSumaAutomatica();
     iniciarTemporizador();
+    estadoJuego = "jugando";
+    continuarBtnJuego.style.display = "none";
+    bastaBtn.style.display = "inline-block";
   }
 
   function iniciarTemporizador() {
@@ -380,7 +345,6 @@
     document.querySelectorAll(".filaRespuestas td[contenteditable='true']").forEach(td => {
       td.contentEditable = "false";
     });
-
     desbloquearPuntosCategoria();
     continuarBtnJuego.textContent = "Guardar puntos";
     continuarBtnJuego.style.display = "inline-block";
@@ -398,21 +362,17 @@
     let html = `<table><thead><tr><th>Jugador</th>`;
     categorias.forEach(cat => html += `<th>${cat}</th>`);
     html += `<th>Puntos</th></tr></thead><tbody>`;
-
     jugadores.forEach(jugador => {
       html += `<tr data-jugador="${jugador}" class="filaRespuestas"><td><strong>${jugador}</strong></td>`;
       categorias.forEach(cat => {
         html += `<td contenteditable="true" data-categoria="${cat}"></td>`;
       });
-      html += `</tr>`;
-
-      html += `<tr class="filaPuntos"><td><em>Puntos:</em></td>`;
+      html += `</tr><tr class="filaPuntos"><td><em>Puntos:</em></td>`;
       categorias.forEach(() => {
         html += `<td class="puntosCategoria" contenteditable="true"></td>`;
       });
       html += `<td class="totalJugador" contenteditable="false"></td></tr>`;
     });
-
     html += `</tbody></table>`;
     return html;
   }
@@ -448,7 +408,6 @@
     const respuestas = {};
     jugadores.forEach(j => respuestas[j] = {});
     const puntosRonda = {};
-
     document.querySelectorAll(".filaRespuestas").forEach(fila => {
       const jugador = fila.dataset.jugador;
       fila.querySelectorAll("td[data-categoria]").forEach(td => {
@@ -456,31 +415,34 @@
         respuestas[jugador][categoria] = td.textContent.trim();
       });
     });
-
     const filas = document.querySelectorAll(".filaPuntos");
     jugadores.forEach((jugador, i) => {
       const filaPuntos = filas[i];
       const total = filaPuntos.querySelector(".totalJugador")?.textContent.trim();
       puntosRonda[jugador] = parseInt(total) || 0;
     });
-
     historialRespuestas.push({
       ronda: numeroRonda,
       letra: letraActual,
       respuestas,
       puntos: puntosRonda
     });
-
     alert("Ronda guardada. ¡Vamos por la siguiente!");
   }
-
   stopBtn.addEventListener("click", () => {
+    if (estadoJuego !== "jugando" && estadoJuego !== "puntuando") return;
+
+    const confirmar = confirm("¿Estás seguro de que deseas detener el juego y ver los resultados?");
+    if (!confirmar) return;
+
     clearInterval(intervaloTemporizador);
+
     if (estadoJuego === "puntuando") guardarPuntos();
     if (historialRespuestas.length === 0) {
       alert("No hay rondas registradas.");
       return;
     }
+
     mostrarTotalesFinales();
   });
 
@@ -496,12 +458,36 @@
     document.getElementById("pantallaResultados").style.display = "block";
     continuarBtnJuego.style.display = "none";
 
+    // Mostrar tabla de puntaje total
     let html = `<table><thead><tr><th>Jugador</th><th>Puntos Totales</th></tr></thead><tbody>`;
     Object.entries(puntosTotales).forEach(([jugador, total]) => {
       html += `<tr><td>${jugador}</td><td><strong>${total}</strong></td></tr>`;
     });
     html += `</tbody></table>`;
     document.getElementById("tablaTotales").innerHTML = html;
+
+    // Mostrar historial por ronda
+    let historialHTML = "<h3>Historial de Rondas</h3>";
+    historialRespuestas.forEach(ronda => {
+      historialHTML += `<h4>Ronda ${ronda.ronda} — Letra: ${ronda.letra}</h4>`;
+      historialHTML += `<table><thead><tr><th>Jugador</th>`;
+      categorias.forEach(cat => {
+        historialHTML += `<th>${cat}</th>`;
+      });
+      historialHTML += `</tr></thead><tbody>`;
+
+      Object.entries(ronda.respuestas).forEach(([jugador, respuestas]) => {
+        historialHTML += `<tr><td><strong>${jugador}</strong></td>`;
+        categorias.forEach(cat => {
+          historialHTML += `<td>${respuestas[cat] || "—"}</td>`;
+        });
+        historialHTML += `</tr>`;
+      });
+
+      historialHTML += `</tbody></table>`;
+    });
+
+    document.getElementById("historialRespuestas").innerHTML = historialHTML;
   }
 
   document.getElementById("volverInicioBtn").addEventListener("click", () => {
@@ -511,28 +497,30 @@
     letraActual = "";
     estadoJuego = "inicio";
 
-    document.querySelectorAll("#inputsJugadores input").forEach(input => input.value = "");
+    document.getElementById("nombreJugador").value = "";
     document.getElementById("tablaRespuestas").innerHTML = "";
     document.getElementById("letraManual").value = "";
     document.getElementById("letra").textContent = "";
     document.getElementById("rondaActual").textContent = "";
     reloj.textContent = "60";
-
     document.getElementById("pantallaResultados").style.display = "none";
-    document.getElementById("pantallaJuego").style.display = "none";
-        document.getElementById("pantallaResultados").style.display = "none";
     document.getElementById("pantallaJuego").style.display = "none";
     document.getElementById("pantallaInicio").style.display = "block";
     document.getElementById("tablaTotales").innerHTML = "";
-
+    document.getElementById("historialRespuestas").innerHTML = "";
     continuarBtn.textContent = "Comenzar";
     continuarBtn.style.display = "inline-block";
-
     document.getElementById("letraManual").disabled = false;
-
   });
 
+  // Advertencia si el usuario intenta salir accidentalmente
+  window.addEventListener("beforeunload", (e) => {
+    if (estadoJuego !== "inicio") {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+  });
 </script>
+
 </body>
 </html>
-   
