@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>¡Basta! Rogelio V1.6</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      text-align: center;
+      padding: 1em;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 2.2em;
+      margin-bottom: 0.5em;
+      color: #333;
+    }
+
+    input[type="text"],
+    button {
+      width: 100%;
+      max-width: 300px;
+    }
+
+    input[type="text"] {
+      padding: 0.8em;
+      margin: 0.5em auto;
+      text-align: center;
+      font-size: 1em;
+      text-transform: uppercase;
+    }
+
+    input:disabled {
+      background-color: #e0e0e0;
+      color: #777;
+      cursor: not-allowed;
+    }
+
+    button {
+      padding: 0.8em 1.5em;
+      font-size: 1em;
+      margin: 0.5em auto;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    /* ✅ Color verde para ambos botones de acción principal */
+    #continuarBtn,
+    #continuarBtnJuego {
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+    }
+
+    #continuarBtn:hover,
+    #continuarBtnJuego:hover {
+      background-color: #218838;
+    }
+
+    #stopBtn {
+      background-color: #dc3545;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    #stopBtn:hover {
+      background-color: #c82333;
+    }
+
+    #bastaBtn {
+      background-color: #fd7e14;
+      font-weight: bold;
+    }
+
+    #bastaBtn:hover {
+      background-color: #e6690e;
+    }
+
+    #rondaActual,
+    #letra,
+    #reloj {
+      font-size: 1.4em;
+      margin: 10px 0;
+    }
+
+    #reloj {
+      color: #dc3545;
+    }
+
+    #tablaRespuestas {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table {
+      margin: 1em auto;
+      border-collapse: collapse;
+      width: 100%;
+      background-color: white;
+      font-size: 0.9em;
+      table-layout: auto;
+      overflow-wrap: break-word;
+    }
+
+    th,
+    td {
+      border: 1px solid #333;
+      padding: 0.6em;
+      text-align: center;
+    }
+
+    th {
+      background-color: #333;
+      color: white;
+    }
+
+    td[contenteditable="true"] {
+      background-color: #fff8dc;
+    }
+
+    .filaPuntos td {
+      background-color: #f5f5f5;
+      font-style: italic;
+    }
+
+    .puntosCategoria {
+      font-weight: normal;
+    }
+
+    .totalJugador {
+      font-weight: bold;
+      font-style: normal;
+      background-color: #d0e6ff;
+      transition: background-color 0.3s;
+    }
+
+    .totalJugador:empty::after {
+      content: "—";
+      color: #aaa;
+    }
+
+    #pantallaResultados h2 {
+      color: #333;
+      margin-top: 2em;
+    }
+
+    #tablaTotales {
+      overflow-x: auto;
+    }
+
+    #tablaTotales table {
+      border-collapse: collapse;
+      margin: 1em auto;
+      background-color: white;
+      width: 100%;
+    }
+
+    #tablaTotales th,
+    #tablaTotales td {
+      border: 1px solid #333;
+      padding: 0.6em;
+    }
+
+    #volverInicioBtn {
+      margin-top: 1em;
+      background-color: #6f42c1;
+      color: white;
+      font-weight: bold;
+      padding: 0.8em 1.5em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #volverInicioBtn:hover {
+      background-color: #5936a2;
+    }
+
+    @media (min-width: 768px) {
+      input[type="text"] {
+        width: 200px;
+        font-size: 1.1em;
+      }
+
+      button {
+        font-size: 1.1em;
+      }
+
+      table {
+        font-size: 1em;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1,
+      h2,
+      h3,
+      #rondaActual,
+      #letra,
+      #reloj {
+        font-size: 1.1em;
+      }
+
+      table th,
+      table td {
+        font-size: 0.8em;
+        padding: 0.4em;
+      }
+
+      #continuarBtn,
+      #continuarBtnJuego,
+      #bastaBtn,
+      #stopBtn,
+      #volverInicioBtn {
+        font-size: 1em;
+        padding: 0.6em 1.2em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>¡Basta! Rogelio V1.6</h1>
+
+  <!-- Pantalla de inicio -->
+  <div id="pantallaInicio">
+    <h2>Ingresa los nombres de los jugadores:</h2>
+    <div id="inputsJugadores">
+      <input type="text" placeholder="Jugador 1" />
+      <input type="text" placeholder="Jugador 2" />
+      <input type="text" placeholder="Jugador 3" />
+      <input type="text" placeholder="Jugador 4" />
+    </div>
+    <!-- Botón para iniciar el juego -->
+    <button id="continuarBtn" style="display: inline-block;">Comenzar</button>
+  </div>
+
+  <!-- Pantalla de juego -->
+  <div id="pantallaJuego" style="display: none;">
+    <div id="rondaActual"></div>
+
+    <h3>Letra para esta ronda:</h3>
+    <input
+      type="text"
+      id="letraManual"
+      maxlength="1"
+      placeholder="Ej. A"
+      style="text-transform: uppercase;"
+    />
+
+    <div id="letra"></div>
+    <div id="reloj">60</div>
+
+    <!-- Tabla de respuestas -->
+    <div id="tablaRespuestas" style="overflow-x: auto; width: 100%;"></div>
+
+    <!-- Botones de control durante el juego -->
+    <button id="continuarBtnJuego" style="display: none;">Iniciar Ronda</button>
+    <button id="bastaBtn" style="display: none;">¡Basta!</button>
+    <button id="stopBtn">Detener juego</button>
+  </div>
+
+  <!-- Pantalla de resultados -->
+  <div id="pantallaResultados" style="display: none;">
+    <h2>Resultados Finales</h2>
+    <div id="tablaTotales" style="overflow-x: auto;"></div>
+    <button id="volverInicioBtn">Jugar de nuevo</button>
+  </div>
+
+<script>
+  const categorias = ["Nombre", "Apellido", "Ciudad", "Animal", "Color", "Flor o Fruto", "Cosa"];
+  let jugadores = [];
+  let letraActual = "";
+  let numeroRonda = 1;
+  let historialRespuestas = [];
+  let intervaloTemporizador;
+  let estadoJuego = "inicio";
+
+  const reloj = document.getElementById("reloj");
+  const continuarBtn = document.getElementById("continuarBtn");           // botón de la pantalla de inicio
+  const continuarBtnJuego = document.getElementById("continuarBtnJuego"); // botón durante el juego
+  const bastaBtn = document.getElementById("bastaBtn");
+  const stopBtn = document.getElementById("stopBtn");
+
+  // --- BOTÓN "Comenzar" en pantalla de inicio ---
+  continuarBtn.addEventListener("click", () => {
+    iniciarJuego();
+    estadoJuego = "letra";
+    continuarBtn.style.display = "none";
+    continuarBtnJuego.textContent = "Iniciar Ronda";
+    continuarBtnJuego.style.display = "inline-block";
+  });
+
+  // --- BOTÓN durante el juego ("Iniciar ronda" o "Guardar puntos") ---
+  continuarBtnJuego.addEventListener("click", () => {
+    switch (estadoJuego) {
+      case "letra":
+        iniciarRonda();
+        estadoJuego = "jugando";
+        continuarBtnJuego.style.display = "none";
+        bastaBtn.style.display = "inline-block";
+        break;
+      case "puntuando":
+        guardarPuntos();
+        numeroRonda++;
+        document.getElementById("rondaActual").textContent = `Ronda: ${numeroRonda}`;
+        document.getElementById("tablaRespuestas").innerHTML = "";
+        document.getElementById("letraManual").value = "";
+        document.getElementById("letra").textContent = "";
+        reloj.textContent = "60";
+        estadoJuego = "letra";
+        continuarBtnJuego.textContent = "Iniciar Ronda";
+        continuarBtnJuego.style.display = "inline-block";
+        bastaBtn.style.display = "none";
+        document.getElementById("letraManual").disabled = false;
+        break;
+    }
+  });
+
+  function iniciarJuego() {
+    jugadores = Array.from(document.querySelectorAll("#inputsJugadores input"))
+      .map(input => input.value.trim())
+      .filter(n => n !== "");
+
+    if (jugadores.length === 0) {
+      alert("Agrega al menos un jugador");
+      return;
+    }
+
+    document.getElementById("pantallaInicio").style.display = "none";
+    document.getElementById("pantallaJuego").style.display = "block";
+    reloj.textContent = "60";
+    document.getElementById("rondaActual").textContent = `Ronda: ${numeroRonda}`;
+    document.getElementById("tablaRespuestas").innerHTML = "";
+    document.getElementById("letraManual").value = "";
+    document.getElementById("letra").textContent = "";
+  }
+
+  function iniciarRonda() {
+    const letraInput = document.getElementById("letraManual").value.trim().toUpperCase();
+    if (!/^[A-ZÑ]$/.test(letraInput)) {
+      alert("Por favor ingresa una letra válida (A-Z o Ñ).");
+      return;
+    }
+
+    letraActual = letraInput;
+    document.getElementById("letra").textContent = `Letra: ${letraActual}`;
+    document.getElementById("letraManual").disabled = true;
+    document.getElementById("tablaRespuestas").innerHTML = generarTablaEditable();
+    bloquearPuntosCategoria();
+    activarSumaAutomatica();
+    iniciarTemporizador();
+  }
+
+  function iniciarTemporizador() {
+    clearInterval(intervaloTemporizador);
+    let tiempo = 60;
+    reloj.textContent = tiempo;
+    intervaloTemporizador = setInterval(() => {
+      tiempo--;
+      reloj.textContent = tiempo;
+      if (tiempo <= 0) {
+        finalizarRonda();
+      }
+    }, 1000);
+  }
+
+  function finalizarRonda() {
+    clearInterval(intervaloTemporizador);
+    document.querySelectorAll(".filaRespuestas td[contenteditable='true']").forEach(td => {
+      td.contentEditable = "false";
+    });
+
+    desbloquearPuntosCategoria();
+    continuarBtnJuego.textContent = "Guardar puntos";
+    continuarBtnJuego.style.display = "inline-block";
+    bastaBtn.style.display = "none";
+    estadoJuego = "puntuando";
+  }
+
+  bastaBtn.addEventListener("click", () => {
+    if (estadoJuego !== "jugando") return;
+    alert("¡Ronda finalizada por un jugador!");
+    finalizarRonda();
+  });
+
+  function generarTablaEditable() {
+    let html = `<table><thead><tr><th>Jugador</th>`;
+    categorias.forEach(cat => html += `<th>${cat}</th>`);
+    html += `<th>Puntos</th></tr></thead><tbody>`;
+
+    jugadores.forEach(jugador => {
+      html += `<tr data-jugador="${jugador}" class="filaRespuestas"><td><strong>${jugador}</strong></td>`;
+      categorias.forEach(cat => {
+        html += `<td contenteditable="true" data-categoria="${cat}"></td>`;
+      });
+      html += `</tr>`;
+
+      html += `<tr class="filaPuntos"><td><em>Puntos:</em></td>`;
+      categorias.forEach(() => {
+        html += `<td class="puntosCategoria" contenteditable="true"></td>`;
+      });
+      html += `<td class="totalJugador" contenteditable="false"></td></tr>`;
+    });
+
+    html += `</tbody></table>`;
+    return html;
+  }
+
+  function activarSumaAutomatica() {
+    document.querySelectorAll(".filaPuntos").forEach(fila => {
+      const puntos = fila.querySelectorAll(".puntosCategoria");
+      const totalCell = fila.querySelector(".totalJugador");
+
+      const actualizar = () => {
+        let suma = 0;
+        puntos.forEach(td => {
+          const val = parseInt(td.textContent.trim());
+          if (!isNaN(val)) suma += val;
+        });
+        totalCell.textContent = suma;
+      };
+
+      puntos.forEach(celda => celda.addEventListener("input", actualizar));
+      actualizar();
+    });
+  }
+
+  function bloquearPuntosCategoria() {
+    document.querySelectorAll(".puntosCategoria, .totalJugador").forEach(td => td.contentEditable = "false");
+  }
+
+  function desbloquearPuntosCategoria() {
+    document.querySelectorAll(".puntosCategoria").forEach(td => td.contentEditable = "true");
+  }
+
+  function guardarPuntos() {
+    const respuestas = {};
+    jugadores.forEach(j => respuestas[j] = {});
+    const puntosRonda = {};
+
+    document.querySelectorAll(".filaRespuestas").forEach(fila => {
+      const jugador = fila.dataset.jugador;
+      fila.querySelectorAll("td[data-categoria]").forEach(td => {
+        const categoria = td.dataset.categoria;
+        respuestas[jugador][categoria] = td.textContent.trim();
+      });
+    });
+
+    const filas = document.querySelectorAll(".filaPuntos");
+    jugadores.forEach((jugador, i) => {
+      const filaPuntos = filas[i];
+      const total = filaPuntos.querySelector(".totalJugador")?.textContent.trim();
+      puntosRonda[jugador] = parseInt(total) || 0;
+    });
+
+    historialRespuestas.push({
+      ronda: numeroRonda,
+      letra: letraActual,
+      respuestas,
+      puntos: puntosRonda
+    });
+
+    alert("Ronda guardada. ¡Vamos por la siguiente!");
+  }
+
+  stopBtn.addEventListener("click", () => {
+    clearInterval(intervaloTemporizador);
+    if (estadoJuego === "puntuando") guardarPuntos();
+    if (historialRespuestas.length === 0) {
+      alert("No hay rondas registradas.");
+      return;
+    }
+    mostrarTotalesFinales();
+  });
+
+  function mostrarTotalesFinales() {
+    const puntosTotales = {};
+    historialRespuestas.forEach(ronda => {
+      Object.entries(ronda.puntos).forEach(([jugador, puntos]) => {
+        puntosTotales[jugador] = (puntosTotales[jugador] || 0) + puntos;
+      });
+    });
+
+    document.getElementById("pantallaJuego").style.display = "none";
+    document.getElementById("pantallaResultados").style.display = "block";
+    continuarBtnJuego.style.display = "none";
+
+    let html = `<table><thead><tr><th>Jugador</th><th>Puntos Totales</th></tr></thead><tbody>`;
+    Object.entries(puntosTotales).forEach(([jugador, total]) => {
+      html += `<tr><td>${jugador}</td><td><strong>${total}</strong></td></tr>`;
+    });
+    html += `</tbody></table>`;
+    document.getElementById("tablaTotales").innerHTML = html;
+  }
+
+  document.getElementById("volverInicioBtn").addEventListener("click", () => {
+    historialRespuestas = [];
+    jugadores = [];
+    numeroRonda = 1;
+    letraActual = "";
+    estadoJuego = "inicio";
+
+    document.querySelectorAll("#inputsJugadores input").forEach(input => input.value = "");
+    document.getElementById("tablaRespuestas").innerHTML = "";
+    document.getElementById("letraManual").value = "";
+    document.getElementById("letra").textContent = "";
+    document.getElementById("rondaActual").textContent = "";
+    reloj.textContent = "60";
+
+    document.getElementById("pantallaResultados").style.display = "none";
+    document.getElementById("pantallaJuego").style.display = "none";
+        document.getElementById("pantallaResultados").style.display = "none";
+    document.getElementById("pantallaJuego").style.display = "none";
+    document.getElementById("pantallaInicio").style.display = "block";
+    document.getElementById("tablaTotales").innerHTML = "";
+
+    continuarBtn.textContent = "Comenzar";
+    continuarBtn.style.display = "inline-block";
+
+    document.getElementById("letraManual").disabled = false;
+
+  });
+
+</script>
+</body>
+</html>
+   
