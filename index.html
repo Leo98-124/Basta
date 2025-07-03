@@ -23,6 +23,22 @@
       color: #333;
     }
 
+    /* Ícono del modo oscuro */
+    #iconoModo {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 1.5em;
+      cursor: pointer;
+      z-index: 1000;
+      user-select: none;
+      transition: transform 0.2s;
+    }
+
+    #iconoModo:hover {
+      transform: scale(1.2);
+    }
+
     input[type="text"],
     button {
       width: 100%;
@@ -84,22 +100,6 @@
       background-color: #e6690e;
     }
 
-    #modoOscuroBtn {
-      background-color: #444;
-      font-weight: bold;
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 0.4em 0.8em;
-      font-size: 0.9em;
-      border-radius: 4px;
-      z-index: 1000;
-    }
-
-    #modoOscuroBtn:hover {
-      background-color: #333;
-    }
-
     #rondaActual,
     #letra,
     #reloj {
@@ -119,8 +119,7 @@
       font-size: 0.9em;
     }
 
-    th,
-    td {
+    th, td {
       border: 1px solid #333;
       padding: 0.6em;
       text-align: center;
@@ -208,11 +207,6 @@
       color: #f8f8f8;
     }
 
-    body.oscuro button {
-      color: white;
-    }
-
-    /* ✅ Celdas editables en modo oscuro */
     body.oscuro td[contenteditable="true"] {
       background-color: #333;
       color: #f8f8f8;
@@ -222,26 +216,17 @@
       outline: 2px solid #888;
     }
 
-    /* ✅ Total de puntos visible */
     body.oscuro .totalJugador {
       background-color: #444;
     }
 
-    /* ✅ Fila de puntos (segunda fila) completa */
     body.oscuro .filaPuntos td {
       background-color: #2a2a2a;
       color: #f8f8f8;
       font-style: italic;
     }
 
-    /* ✅ Primera celda de esa fila: "Puntos:" visible */
-    body.oscuro .filaPuntos td:first-child {
-      background-color: #2a2a2a;
-      color: #f8f8f8;
-      font-style: italic;
-    }
-
-    @media (max-width: 480px) {
+    @media (max-width: 600px) {
       h1, h2, h3,
       #rondaActual, #letra, #reloj {
         font-size: 1.1em;
@@ -262,10 +247,8 @@
 </head>
 
 <body>
-  <!-- Botón de modo oscuro con icono intercambiable -->
-  <button id="modoOscuroBtn">
-    <span id="iconoModo">🌙</span>
-  </button>
+  <!-- Ícono fijo para cambiar modo oscuro -->
+  <span id="iconoModo" title="Cambiar modo oscuro">🌙</span>
 
   <h1>¡Basta! Rogelio V1.6</h1>
 
@@ -311,288 +294,287 @@
     <button id="volverInicioBtn">Jugar de nuevo</button>
   </div>
 
-
 <script>
-  const categorias = ["Nombre", "Apellido", "Ciudad", "Animal", "Color", "Flor o Fruto", "Cosa"];
-  let jugadores = [];
-  let letraActual = "";
-  let numeroRonda = 1;
-  let historialRespuestas = [];
-  let intervaloTemporizador;
-  let estadoJuego = "inicio";
+const categorias = ["Nombre", "Apellido", "Ciudad", "Animal", "Color", "Flor o Fruto", "Cosa"];
+let jugadores = [];
+let letraActual = "";
+let numeroRonda = 1;
+let historialRespuestas = [];
+let intervaloTemporizador;
+let estadoJuego = "inicio";
 
-  const reloj = document.getElementById("reloj");
-  const continuarBtn = document.getElementById("continuarBtn");
-  const continuarBtnJuego = document.getElementById("continuarBtnJuego");
-  const bastaBtn = document.getElementById("bastaBtn");
-  const stopBtn = document.getElementById("stopBtn");
+const reloj = document.getElementById("reloj");
+const continuarBtn = document.getElementById("continuarBtn");
+const continuarBtnJuego = document.getElementById("continuarBtnJuego");
+const bastaBtn = document.getElementById("bastaBtn");
+const stopBtn = document.getElementById("stopBtn");
 
-  // Activar modo oscuro con cambio de ícono
-  document.getElementById("modoOscuroBtn").addEventListener("click", () => {
-    document.body.classList.toggle("oscuro");
-    const icono = document.getElementById("iconoModo");
-    const esOscuro = document.body.classList.contains("oscuro");
-    icono.textContent = esOscuro ? "☀️" : "🌙";
-  });
+// Activar modo oscuro con ícono
+document.getElementById("iconoModo").addEventListener("click", () => {
+  document.body.classList.toggle("oscuro");
+  const icono = document.getElementById("iconoModo");
+  icono.textContent = document.body.classList.contains("oscuro") ? "☀️" : "🌙";
+});
 
-  continuarBtn.addEventListener("click", () => {
-    const nombre = document.getElementById("nombreJugador").value.trim();
-    if (!nombre) {
-      alert("Por favor ingresa tu nombre.");
-      return;
-    }
-    jugadores = [nombre];
-    estadoJuego = "letra";
-    document.getElementById("pantallaInicio").style.display = "none";
-    document.getElementById("pantallaJuego").style.display = "block";
-    reloj.textContent = "60";
+continuarBtn.addEventListener("click", () => {
+  const nombre = document.getElementById("nombreJugador").value.trim();
+  if (!nombre) {
+    alert("Por favor ingresa tu nombre.");
+    return;
+  }
+  jugadores = [nombre];
+  estadoJuego = "letra";
+  document.getElementById("pantallaInicio").style.display = "none";
+  document.getElementById("pantallaJuego").style.display = "block";
+  reloj.textContent = "60";
+  document.getElementById("rondaActual").textContent = `Ronda: ${numeroRonda}`;
+  document.getElementById("tablaRespuestas").innerHTML = "";
+  document.getElementById("letraManual").value = "";
+  document.getElementById("letra").textContent = "";
+  continuarBtn.style.display = "none";
+  continuarBtnJuego.textContent = "Iniciar Ronda";
+  continuarBtnJuego.style.display = "inline-block";
+});
+
+continuarBtnJuego.addEventListener("click", () => {
+  if (estadoJuego === "letra") {
+    iniciarRonda();
+  } else if (estadoJuego === "puntuando") {
+    guardarPuntos();
+    numeroRonda++;
     document.getElementById("rondaActual").textContent = `Ronda: ${numeroRonda}`;
     document.getElementById("tablaRespuestas").innerHTML = "";
     document.getElementById("letraManual").value = "";
     document.getElementById("letra").textContent = "";
-    continuarBtn.style.display = "none";
+    reloj.textContent = "60";
+    estadoJuego = "letra";
     continuarBtnJuego.textContent = "Iniciar Ronda";
     continuarBtnJuego.style.display = "inline-block";
-  });
-
-  continuarBtnJuego.addEventListener("click", () => {
-    if (estadoJuego === "letra") {
-      iniciarRonda();
-    } else if (estadoJuego === "puntuando") {
-      guardarPuntos();
-      numeroRonda++;
-      document.getElementById("rondaActual").textContent = `Ronda: ${numeroRonda}`;
-      document.getElementById("tablaRespuestas").innerHTML = "";
-      document.getElementById("letraManual").value = "";
-      document.getElementById("letra").textContent = "";
-      reloj.textContent = "60";
-      estadoJuego = "letra";
-      continuarBtnJuego.textContent = "Iniciar Ronda";
-      continuarBtnJuego.style.display = "inline-block";
-      bastaBtn.style.display = "none";
-      document.getElementById("letraManual").disabled = false;
-    }
-  });
-
-  function iniciarRonda() {
-    const letraInput = document.getElementById("letraManual").value.trim().toUpperCase();
-    if (!/^[A-ZÑ]$/.test(letraInput)) {
-      alert("Por favor ingresa una letra válida (A-Z o Ñ).");
-      return;
-    }
-    letraActual = letraInput;
-    document.getElementById("letra").textContent = `Letra: ${letraActual}`;
-    document.getElementById("letraManual").disabled = true;
-    document.getElementById("tablaRespuestas").innerHTML = generarTablaEditable();
-    bloquearPuntosCategoria();
-    activarSumaAutomatica();
-    iniciarTemporizador();
-    estadoJuego = "jugando";
-    continuarBtnJuego.style.display = "none";
-    bastaBtn.style.display = "inline-block";
-  }
-
-  function iniciarTemporizador() {
-    clearInterval(intervaloTemporizador);
-    let tiempo = 60;
-    reloj.textContent = tiempo;
-    intervaloTemporizador = setInterval(() => {
-      tiempo--;
-      reloj.textContent = tiempo;
-      if (tiempo <= 0) {
-        finalizarRonda();
-      }
-    }, 1000);
-  }
-
-  function finalizarRonda() {
-    clearInterval(intervaloTemporizador);
-    document.querySelectorAll(".filaRespuestas td[contenteditable='true']").forEach(td => {
-      td.contentEditable = "false";
-    });
-    desbloquearPuntosCategoria();
-    continuarBtnJuego.textContent = "Guardar puntos";
-    continuarBtnJuego.style.display = "inline-block";
     bastaBtn.style.display = "none";
-    estadoJuego = "puntuando";
+    document.getElementById("letraManual").disabled = false;
   }
+});
 
-  bastaBtn.addEventListener("click", () => {
-    if (estadoJuego !== "jugando") return;
-    alert("¡Ronda finalizada por un jugador!");
-    finalizarRonda();
+function iniciarRonda() {
+  const letraInput = document.getElementById("letraManual").value.trim().toUpperCase();
+  if (!/^[A-ZÑ]$/.test(letraInput)) {
+    alert("Por favor ingresa una letra válida (A-Z o Ñ).");
+    return;
+  }
+  letraActual = letraInput;
+  document.getElementById("letra").textContent = `Letra: ${letraActual}`;
+  document.getElementById("letraManual").disabled = true;
+  document.getElementById("tablaRespuestas").innerHTML = generarTablaEditable();
+  bloquearPuntosCategoria();
+  activarSumaAutomatica();
+  iniciarTemporizador();
+  estadoJuego = "jugando";
+  continuarBtnJuego.style.display = "none";
+  bastaBtn.style.display = "inline-block";
+}
+
+function iniciarTemporizador() {
+  clearInterval(intervaloTemporizador);
+  let tiempo = 60;
+  reloj.textContent = tiempo;
+  intervaloTemporizador = setInterval(() => {
+    tiempo--;
+    reloj.textContent = tiempo;
+    if (tiempo <= 0) {
+      finalizarRonda();
+    }
+  }, 1000);
+}
+
+// Finalizar ronda al agotarse el tiempo o decir ¡Basta!
+function finalizarRonda() {
+  clearInterval(intervaloTemporizador);
+  document.querySelectorAll(".filaRespuestas td[contenteditable='true']").forEach(td => {
+    td.contentEditable = "false";
+  });
+  desbloquearPuntosCategoria();
+  continuarBtnJuego.textContent = "Guardar puntos";
+  continuarBtnJuego.style.display = "inline-block";
+  bastaBtn.style.display = "none";
+  estadoJuego = "puntuando";
+}
+
+// ¡Basta! manual
+bastaBtn.addEventListener("click", () => {
+  if (estadoJuego !== "jugando") return;
+  alert("¡Ronda finalizada por un jugador!");
+  finalizarRonda();
+});
+
+// Generar tabla editable para ingresar respuestas
+function generarTablaEditable() {
+  let html = `<table><thead><tr><th>Jugador</th>`;
+  categorias.forEach(cat => html += `<th>${cat}</th>`);
+  html += `<th>Puntos</th></tr></thead><tbody>`;
+  jugadores.forEach(jugador => {
+    html += `<tr data-jugador="${jugador}" class="filaRespuestas"><td><strong>${jugador}</strong></td>`;
+    categorias.forEach(cat => {
+      html += `<td contenteditable="true" data-categoria="${cat}"></td>`;
+    });
+    html += `</tr><tr class="filaPuntos"><td><em>Puntos:</em></td>`;
+    categorias.forEach(() => {
+      html += `<td class="puntosCategoria" contenteditable="true"></td>`;
+    });
+    html += `<td class="totalJugador" contenteditable="false"></td></tr>`;
+  });
+  html += `</tbody></table>`;
+  return html;
+}
+
+// Calcular puntos totales automáticamente
+function activarSumaAutomatica() {
+  document.querySelectorAll(".filaPuntos").forEach(fila => {
+    const puntos = fila.querySelectorAll(".puntosCategoria");
+    const totalCell = fila.querySelector(".totalJugador");
+
+    const actualizar = () => {
+      let suma = 0;
+      puntos.forEach(td => {
+        const val = parseInt(td.textContent.trim());
+        if (!isNaN(val)) suma += val;
+      });
+      totalCell.textContent = suma;
+    };
+
+    puntos.forEach(celda => celda.addEventListener("input", actualizar));
+    actualizar();
+  });
+}
+
+function bloquearPuntosCategoria() {
+  document.querySelectorAll(".puntosCategoria, .totalJugador").forEach(td => td.contentEditable = "false");
+}
+
+function desbloquearPuntosCategoria() {
+  document.querySelectorAll(".puntosCategoria").forEach(td => td.contentEditable = "true");
+}
+
+// Guardar respuestas y puntajes en historial
+function guardarPuntos() {
+  const respuestas = {};
+  jugadores.forEach(j => respuestas[j] = {});
+  const puntosRonda = {};
+
+  document.querySelectorAll(".filaRespuestas").forEach(fila => {
+    const jugador = fila.dataset.jugador;
+    fila.querySelectorAll("td[data-categoria]").forEach(td => {
+      const categoria = td.dataset.categoria;
+      respuestas[jugador][categoria] = td.textContent.trim();
+    });
   });
 
-  function generarTablaEditable() {
-    let html = `<table><thead><tr><th>Jugador</th>`;
-    categorias.forEach(cat => html += `<th>${cat}</th>`);
-    html += `<th>Puntos</th></tr></thead><tbody>`;
-    jugadores.forEach(jugador => {
-      html += `<tr data-jugador="${jugador}" class="filaRespuestas"><td><strong>${jugador}</strong></td>`;
+  const filas = document.querySelectorAll(".filaPuntos");
+  jugadores.forEach((jugador, i) => {
+    const filaPuntos = filas[i];
+    const total = filaPuntos.querySelector(".totalJugador")?.textContent.trim();
+    puntosRonda[jugador] = parseInt(total) || 0;
+  });
+
+  historialRespuestas.push({
+    ronda: numeroRonda,
+    letra: letraActual,
+    respuestas,
+    puntos: puntosRonda
+  });
+
+  alert("Ronda guardada. ¡Vamos por la siguiente!");
+}
+
+// Mostrar pantalla de resultados finales
+function mostrarTotalesFinales() {
+  const puntosTotales = {};
+  historialRespuestas.forEach(ronda => {
+    Object.entries(ronda.puntos).forEach(([jugador, puntos]) => {
+      puntosTotales[jugador] = (puntosTotales[jugador] || 0) + puntos;
+    });
+  });
+
+  document.getElementById("pantallaJuego").style.display = "none";
+  document.getElementById("pantallaResultados").style.display = "block";
+  continuarBtnJuego.style.display = "none";
+
+  let html = `<table><thead><tr><th>Jugador</th><th>Puntos Totales</th></tr></thead><tbody>`;
+  Object.entries(puntosTotales).forEach(([jugador, total]) => {
+    html += `<tr><td>${jugador}</td><td><strong>${total}</strong></td></tr>`;
+  });
+  html += `</tbody></table>`;
+  document.getElementById("tablaTotales").innerHTML = html;
+
+  let historialHTML = "<h3>Historial de Rondas</h3>";
+  historialRespuestas.forEach(ronda => {
+    historialHTML += `<h4>Ronda ${ronda.ronda} — Letra: ${ronda.letra}</h4>`;
+    historialHTML += `<table><thead><tr><th>Jugador</th>`;
+    categorias.forEach(cat => { historialHTML += `<th>${cat}</th>`; });
+    historialHTML += `</tr></thead><tbody>`;
+    Object.entries(ronda.respuestas).forEach(([jugador, respuestas]) => {
+      historialHTML += `<tr><td><strong>${jugador}</strong></td>`;
       categorias.forEach(cat => {
-        html += `<td contenteditable="true" data-categoria="${cat}"></td>`;
+        historialHTML += `<td>${respuestas[cat] || "—"}</td>`;
       });
-      html += `</tr><tr class="filaPuntos"><td><em>Puntos:</em></td>`;
-      categorias.forEach(() => {
-        html += `<td class="puntosCategoria" contenteditable="true"></td>`;
-      });
-      html += `<td class="totalJugador" contenteditable="false"></td></tr>`;
+      historialHTML += `</tr>`;
     });
-    html += `</tbody></table>`;
-    return html;
-  }
+    historialHTML += `</tbody></table>`;
+  });
 
-  function activarSumaAutomatica() {
-    document.querySelectorAll(".filaPuntos").forEach(fila => {
-      const puntos = fila.querySelectorAll(".puntosCategoria");
-      const totalCell = fila.querySelector(".totalJugador");
+  document.getElementById("historialRespuestas").innerHTML = historialHTML;
+}
 
-      const actualizar = () => {
-        let suma = 0;
-        puntos.forEach(td => {
-          const val = parseInt(td.textContent.trim());
-          if (!isNaN(val)) suma += val;
-        });
-        totalCell.textContent = suma;
-      };
-
-      puntos.forEach(celda => celda.addEventListener("input", actualizar));
-      actualizar();
-    });
-  }
-
-  function bloquearPuntosCategoria() {
-    document.querySelectorAll(".puntosCategoria, .totalJugador").forEach(td => td.contentEditable = "false");
-  }
-
-  function desbloquearPuntosCategoria() {
-    document.querySelectorAll(".puntosCategoria").forEach(td => td.contentEditable = "true");
-  }
-
-  function guardarPuntos() {
-    const respuestas = {};
-    jugadores.forEach(j => respuestas[j] = {});
-    const puntosRonda = {};
-
-    document.querySelectorAll(".filaRespuestas").forEach(fila => {
-      const jugador = fila.dataset.jugador;
-      fila.querySelectorAll("td[data-categoria]").forEach(td => {
-        const categoria = td.dataset.categoria;
-        respuestas[jugador][categoria] = td.textContent.trim();
-      });
-    });
-
-    const filas = document.querySelectorAll(".filaPuntos");
-    jugadores.forEach((jugador, i) => {
-      const filaPuntos = filas[i];
-      const total = filaPuntos.querySelector(".totalJugador")?.textContent.trim();
-      puntosRonda[jugador] = parseInt(total) || 0;
-    });
-
-    historialRespuestas.push({
-      ronda: numeroRonda,
-      letra: letraActual,
-      respuestas,
-      puntos: puntosRonda
-    });
-
-    alert("Ronda guardada. ¡Vamos por la siguiente!");
-  }
-
-  function mostrarTotalesFinales() {
-    const puntosTotales = {};
-    historialRespuestas.forEach(ronda => {
-      Object.entries(ronda.puntos).forEach(([jugador, puntos]) => {
-        puntosTotales[jugador] = (puntosTotales[jugador] || 0) + puntos;
-      });
-    });
-
-    document.getElementById("pantallaJuego").style.display = "none";
-    document.getElementById("pantallaResultados").style.display = "block";
-    continuarBtnJuego.style.display = "none";
-
-    // Mostrar tabla de totales
-    let html = `<table><thead><tr><th>Jugador</th><th>Puntos Totales</th></tr></thead><tbody>`;
-    Object.entries(puntosTotales).forEach(([jugador, total]) => {
-      html += `<tr><td>${jugador}</td><td><strong>${total}</strong></td></tr>`;
-    });
-    html += `</tbody></table>`;
-    document.getElementById("tablaTotales").innerHTML = html;
-
-    // Mostrar historial de rondas
-    let historialHTML = "<h3>Historial de Rondas</h3>";
-    historialRespuestas.forEach(ronda => {
-      historialHTML += `<h4>Ronda ${ronda.ronda} — Letra: ${ronda.letra}</h4>`;
-      historialHTML += `<table><thead><tr><th>Jugador</th>`;
-      categorias.forEach(cat => {
-        historialHTML += `<th>${cat}</th>`;
-      });
-      historialHTML += `</tr></thead><tbody>`;
-      Object.entries(ronda.respuestas).forEach(([jugador, respuestas]) => {
-        historialHTML += `<tr><td><strong>${jugador}</strong></td>`;
-        categorias.forEach(cat => {
-          historialHTML += `<td>${respuestas[cat] || "—"}</td>`;
-        });
-        historialHTML += `</tr>`;
-      });
-      historialHTML += `</tbody></table>`;
-    });
-
-    document.getElementById("historialRespuestas").innerHTML = historialHTML;
-  }
-
- stopBtn.addEventListener("click", () => {
+// Detener el juego y mostrar resultados
+stopBtn.addEventListener("click", () => {
   if (estadoJuego === "inicio") return;
 
   const confirmar = confirm("¿Deseas detener el juego y ver los resultados?");
-
   if (!confirmar) return;
 
   clearInterval(intervaloTemporizador);
-
   if (estadoJuego === "puntuando") guardarPuntos();
 
   if (historialRespuestas.length === 0) {
     alert("No hay rondas registradas. Se reiniciará el juego.");
-    document.getElementById("volverInicioBtn").click(); // Simula clic en "Jugar de nuevo"
+    document.getElementById("volverInicioBtn").click();
     return;
   }
 
   mostrarTotalesFinales();
-}); 
+});
 
-  document.getElementById("volverInicioBtn").addEventListener("click", () => {
-    historialRespuestas = [];
-    jugadores = [];
-    numeroRonda = 1;
-    letraActual = "";
-    estadoJuego = "inicio";
+// Volver al inicio
+document.getElementById("volverInicioBtn").addEventListener("click", () => {
+  historialRespuestas = [];
+  jugadores = [];
+  numeroRonda = 1;
+  letraActual = "";
+  estadoJuego = "inicio";
 
-    document.getElementById("nombreJugador").value = "";
-    document.getElementById("tablaRespuestas").innerHTML = "";
-    document.getElementById("letraManual").value = "";
-    document.getElementById("letra").textContent = "";
-    document.getElementById("rondaActual").textContent = "";
-    reloj.textContent = "60";
-    document.getElementById("pantallaResultados").style.display = "none";
-    document.getElementById("pantallaJuego").style.display = "none";
-    document.getElementById("pantallaInicio").style.display = "block";
-    document.getElementById("tablaTotales").innerHTML = "";
-    document.getElementById("historialRespuestas").innerHTML = "";
-    continuarBtn.textContent = "Comenzar";
-    continuarBtn.style.display = "inline-block";
-    document.getElementById("letraManual").disabled = false;
-  });
+  document.getElementById("nombreJugador").value = "";
+  document.getElementById("tablaRespuestas").innerHTML = "";
+  document.getElementById("letraManual").value = "";
+  document.getElementById("letra").textContent = "";
+  document.getElementById("rondaActual").textContent = "";
+  reloj.textContent = "60";
+  document.getElementById("pantallaResultados").style.display = "none";
+  document.getElementById("pantallaJuego").style.display = "none";
+  document.getElementById("pantallaInicio").style.display = "block";
+  document.getElementById("tablaTotales").innerHTML = "";
+  document.getElementById("historialRespuestas").innerHTML = "";
+  continuarBtn.textContent = "Comenzar";
+  continuarBtn.style.display = "inline-block";
+  document.getElementById("letraManual").disabled = false;
+});
 
-  // Protege contra salida accidental
-  window.addEventListener("beforeunload", (e) => {
-    if (estadoJuego !== "inicio") {
-      e.preventDefault();
-      e.returnValue = "";
-    }
-  });
-
+// Confirmación antes de salir del juego
+window.addEventListener("beforeunload", (e) => {
+  if (estadoJuego !== "inicio") {
+    e.preventDefault();
+    e.returnValue = "";
+  }
+});
 </script>
+
 </body>
 </html>
-   
