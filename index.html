@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>¡Basta! Rogelio V1.6</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: Arial, sans-serif;
@@ -15,6 +13,8 @@
       text-align: center;
       padding: 1em;
       margin: 0;
+      color: #222;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     h1 {
@@ -23,7 +23,8 @@
       color: #333;
     }
 
-    input[type="text"], button {
+    input[type="text"],
+    button {
       width: 100%;
       max-width: 300px;
     }
@@ -53,12 +54,14 @@
       transition: all 0.3s ease;
     }
 
-    #continuarBtn, #continuarBtnJuego {
+    #continuarBtn,
+    #continuarBtnJuego {
       background-color: #28a745;
       font-weight: bold;
     }
 
-    #continuarBtn:hover, #continuarBtnJuego:hover {
+    #continuarBtn:hover,
+    #continuarBtnJuego:hover {
       background-color: #218838;
     }
 
@@ -81,6 +84,22 @@
       background-color: #e6690e;
     }
 
+    #modoOscuroBtn {
+      background-color: #444;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 0.4em 0.8em;
+      font-size: 0.9em;
+      border-radius: 4px;
+      z-index: 1000;
+    }
+
+    #modoOscuroBtn:hover {
+      background-color: #333;
+    }
+
     #rondaActual,
     #letra,
     #reloj {
@@ -92,23 +111,16 @@
       color: #dc3545;
     }
 
-    #tablaRespuestas,
-    #tablaTotales {
-      overflow-x: auto;
-      width: 100%;
-    }
-
     table {
       margin: 1em auto;
       border-collapse: collapse;
       width: 100%;
       background-color: white;
       font-size: 0.9em;
-      table-layout: auto;
-      overflow-wrap: break-word;
     }
 
-    th, td {
+    th,
+    td {
       border: 1px solid #333;
       padding: 0.6em;
       text-align: center;
@@ -134,7 +146,6 @@
 
     .totalJugador {
       font-weight: bold;
-      font-style: normal;
       background-color: #d0e6ff;
       transition: background-color 0.3s;
     }
@@ -144,57 +155,100 @@
       color: #aaa;
     }
 
-    #pantallaResultados h2 {
-      color: #333;
-      margin-top: 2em;
-    }
-
     #volverInicioBtn {
       margin-top: 1em;
       background-color: #6f42c1;
-      color: white;
-      font-weight: bold;
-      padding: 0.8em 1.5em;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
     }
 
     #volverInicioBtn:hover {
       background-color: #5936a2;
     }
 
-    #historialRespuestas h3 {
-      color: #444;
-      margin-top: 2em;
+    #imagenInicio {
+      display: block;
+      margin: 1.5em auto 0.5em;
+      max-width: 200px;
+      height: auto;
     }
 
-    #historialRespuestas h4 {
-      margin-bottom: 0.4em;
-      color: #333;
+    /* 🌙 Estilos para modo oscuro */
+    body.oscuro {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
     }
 
-    @media (min-width: 768px) {
-      input[type="text"] {
-        width: 200px;
-        font-size: 1.1em;
-      }
+    body.oscuro table {
+      background-color: #2b2b2b;
+    }
 
-      button {
-        font-size: 1.1em;
-      }
+    body.oscuro th {
+      background-color: #444;
+      color: #fff;
+    }
 
-      table {
-        font-size: 1em;
-      }
+    body.oscuro td {
+      border-color: #666;
+      color: #f8f8f8;
+    }
+
+    body.oscuro input[type="text"] {
+      background-color: #333;
+      color: #f0f0f0;
+      border: none;
+    }
+
+    body.oscuro h1,
+    body.oscuro h2,
+    body.oscuro h3,
+    body.oscuro #letra,
+    body.oscuro #rondaActual,
+    body.oscuro #reloj,
+    body.oscuro .puntosCategoria,
+    body.oscuro .totalJugador {
+      color: #f8f8f8;
+    }
+
+    body.oscuro button {
+      color: white;
+    }
+
+    /* ✅ Celdas editables en modo oscuro */
+    body.oscuro td[contenteditable="true"] {
+      background-color: #333;
+      color: #f8f8f8;
+    }
+
+    body.oscuro td[contenteditable="true"]:focus {
+      outline: 2px solid #888;
+    }
+
+    /* ✅ Total de puntos visible */
+    body.oscuro .totalJugador {
+      background-color: #444;
+    }
+
+    /* ✅ Fila de puntos (segunda fila) completa */
+    body.oscuro .filaPuntos td {
+      background-color: #2a2a2a;
+      color: #f8f8f8;
+      font-style: italic;
+    }
+
+    /* ✅ Primera celda de esa fila: "Puntos:" visible */
+    body.oscuro .filaPuntos td:first-child {
+      background-color: #2a2a2a;
+      color: #f8f8f8;
+      font-style: italic;
     }
 
     @media (max-width: 480px) {
-      h1, h2, h3, #rondaActual, #letra, #reloj {
+      h1, h2, h3,
+      #rondaActual, #letra, #reloj {
         font-size: 1.1em;
       }
 
-      table th, table td {
+      table th,
+      table td {
         font-size: 0.8em;
         padding: 0.4em;
       }
@@ -208,6 +262,11 @@
 </head>
 
 <body>
+  <!-- Botón de modo oscuro con icono intercambiable -->
+  <button id="modoOscuroBtn">
+    <span id="iconoModo">🌙</span>
+  </button>
+
   <h1>¡Basta! Rogelio V1.6</h1>
 
   <!-- Pantalla de inicio -->
@@ -217,12 +276,17 @@
       <input type="text" id="nombreJugador" placeholder="Tu nombre" />
     </div>
     <button id="continuarBtn" style="display: inline-block;">Comenzar</button>
+    <img
+      src="imglogo.png"
+      alt="Logo del juego"
+      id="imagenInicio"
+      style="max-width: 200px; margin-top: 1.2em;"
+    />
   </div>
 
   <!-- Pantalla de juego -->
   <div id="pantallaJuego" style="display: none;">
     <div id="rondaActual"></div>
-
     <h3>Letra para esta ronda:</h3>
     <input
       type="text"
@@ -231,14 +295,9 @@
       placeholder="Ej. A"
       style="text-transform: uppercase;"
     />
-
     <div id="letra"></div>
     <div id="reloj">60</div>
-
-    <!-- Tabla de respuestas -->
     <div id="tablaRespuestas" style="overflow-x: auto; width: 100%;"></div>
-
-    <!-- Botones de control durante el juego -->
     <button id="continuarBtnJuego" style="display: none;">Iniciar Ronda</button>
     <button id="bastaBtn" style="display: none;">¡Basta!</button>
     <button id="stopBtn">Detener juego</button>
@@ -251,6 +310,7 @@
     <div id="historialRespuestas"></div>
     <button id="volverInicioBtn">Jugar de nuevo</button>
   </div>
+
 
 <script>
   const categorias = ["Nombre", "Apellido", "Ciudad", "Animal", "Color", "Flor o Fruto", "Cosa"];
@@ -266,6 +326,14 @@
   const continuarBtnJuego = document.getElementById("continuarBtnJuego");
   const bastaBtn = document.getElementById("bastaBtn");
   const stopBtn = document.getElementById("stopBtn");
+
+  // Activar modo oscuro con cambio de ícono
+  document.getElementById("modoOscuroBtn").addEventListener("click", () => {
+    document.body.classList.toggle("oscuro");
+    const icono = document.getElementById("iconoModo");
+    const esOscuro = document.body.classList.contains("oscuro");
+    icono.textContent = esOscuro ? "☀️" : "🌙";
+  });
 
   continuarBtn.addEventListener("click", () => {
     const nombre = document.getElementById("nombreJugador").value.trim();
@@ -288,24 +356,21 @@
   });
 
   continuarBtnJuego.addEventListener("click", () => {
-    switch (estadoJuego) {
-      case "letra":
-        iniciarRonda();
-        break;
-      case "puntuando":
-        guardarPuntos();
-        numeroRonda++;
-        document.getElementById("rondaActual").textContent = `Ronda: ${numeroRonda}`;
-        document.getElementById("tablaRespuestas").innerHTML = "";
-        document.getElementById("letraManual").value = "";
-        document.getElementById("letra").textContent = "";
-        reloj.textContent = "60";
-        estadoJuego = "letra";
-        continuarBtnJuego.textContent = "Iniciar Ronda";
-        continuarBtnJuego.style.display = "inline-block";
-        bastaBtn.style.display = "none";
-        document.getElementById("letraManual").disabled = false;
-        break;
+    if (estadoJuego === "letra") {
+      iniciarRonda();
+    } else if (estadoJuego === "puntuando") {
+      guardarPuntos();
+      numeroRonda++;
+      document.getElementById("rondaActual").textContent = `Ronda: ${numeroRonda}`;
+      document.getElementById("tablaRespuestas").innerHTML = "";
+      document.getElementById("letraManual").value = "";
+      document.getElementById("letra").textContent = "";
+      reloj.textContent = "60";
+      estadoJuego = "letra";
+      continuarBtnJuego.textContent = "Iniciar Ronda";
+      continuarBtnJuego.style.display = "inline-block";
+      bastaBtn.style.display = "none";
+      document.getElementById("letraManual").disabled = false;
     }
   });
 
@@ -408,6 +473,7 @@
     const respuestas = {};
     jugadores.forEach(j => respuestas[j] = {});
     const puntosRonda = {};
+
     document.querySelectorAll(".filaRespuestas").forEach(fila => {
       const jugador = fila.dataset.jugador;
       fila.querySelectorAll("td[data-categoria]").forEach(td => {
@@ -415,36 +481,23 @@
         respuestas[jugador][categoria] = td.textContent.trim();
       });
     });
+
     const filas = document.querySelectorAll(".filaPuntos");
     jugadores.forEach((jugador, i) => {
       const filaPuntos = filas[i];
       const total = filaPuntos.querySelector(".totalJugador")?.textContent.trim();
       puntosRonda[jugador] = parseInt(total) || 0;
     });
+
     historialRespuestas.push({
       ronda: numeroRonda,
       letra: letraActual,
       respuestas,
       puntos: puntosRonda
     });
+
     alert("Ronda guardada. ¡Vamos por la siguiente!");
   }
-  stopBtn.addEventListener("click", () => {
-    if (estadoJuego !== "jugando" && estadoJuego !== "puntuando") return;
-
-    const confirmar = confirm("¿Estás seguro de que deseas detener el juego y ver los resultados?");
-    if (!confirmar) return;
-
-    clearInterval(intervaloTemporizador);
-
-    if (estadoJuego === "puntuando") guardarPuntos();
-    if (historialRespuestas.length === 0) {
-      alert("No hay rondas registradas.");
-      return;
-    }
-
-    mostrarTotalesFinales();
-  });
 
   function mostrarTotalesFinales() {
     const puntosTotales = {};
@@ -458,7 +511,7 @@
     document.getElementById("pantallaResultados").style.display = "block";
     continuarBtnJuego.style.display = "none";
 
-    // Mostrar tabla de puntaje total
+    // Mostrar tabla de totales
     let html = `<table><thead><tr><th>Jugador</th><th>Puntos Totales</th></tr></thead><tbody>`;
     Object.entries(puntosTotales).forEach(([jugador, total]) => {
       html += `<tr><td>${jugador}</td><td><strong>${total}</strong></td></tr>`;
@@ -466,7 +519,7 @@
     html += `</tbody></table>`;
     document.getElementById("tablaTotales").innerHTML = html;
 
-    // Mostrar historial por ronda
+    // Mostrar historial de rondas
     let historialHTML = "<h3>Historial de Rondas</h3>";
     historialRespuestas.forEach(ronda => {
       historialHTML += `<h4>Ronda ${ronda.ronda} — Letra: ${ronda.letra}</h4>`;
@@ -475,7 +528,6 @@
         historialHTML += `<th>${cat}</th>`;
       });
       historialHTML += `</tr></thead><tbody>`;
-
       Object.entries(ronda.respuestas).forEach(([jugador, respuestas]) => {
         historialHTML += `<tr><td><strong>${jugador}</strong></td>`;
         categorias.forEach(cat => {
@@ -483,12 +535,31 @@
         });
         historialHTML += `</tr>`;
       });
-
       historialHTML += `</tbody></table>`;
     });
 
     document.getElementById("historialRespuestas").innerHTML = historialHTML;
   }
+
+ stopBtn.addEventListener("click", () => {
+  if (estadoJuego === "inicio") return;
+
+  const confirmar = confirm("¿Deseas detener el juego y ver los resultados?");
+
+  if (!confirmar) return;
+
+  clearInterval(intervaloTemporizador);
+
+  if (estadoJuego === "puntuando") guardarPuntos();
+
+  if (historialRespuestas.length === 0) {
+    alert("No hay rondas registradas. Se reiniciará el juego.");
+    document.getElementById("volverInicioBtn").click(); // Simula clic en "Jugar de nuevo"
+    return;
+  }
+
+  mostrarTotalesFinales();
+}); 
 
   document.getElementById("volverInicioBtn").addEventListener("click", () => {
     historialRespuestas = [];
@@ -513,14 +584,15 @@
     document.getElementById("letraManual").disabled = false;
   });
 
-  // Advertencia si el usuario intenta salir accidentalmente
+  // Protege contra salida accidental
   window.addEventListener("beforeunload", (e) => {
     if (estadoJuego !== "inicio") {
       e.preventDefault();
       e.returnValue = "";
     }
   });
-</script>
 
+</script>
 </body>
 </html>
+   
